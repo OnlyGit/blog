@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="spring," />
 
 
 
@@ -84,15 +84,16 @@
 
 
 
-<meta name="description" content="成长点滴">
-<meta property="og:type" content="website">
-<meta property="og:title" content="OnlyGit-blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="spring容器bean初始化问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring容器bean初始化问题">
+<meta property="og:url" content="http://yoursite.com/2016/09/17/spring-load-order/index.html">
 <meta property="og:site_name" content="OnlyGit-blog">
-<meta property="og:description" content="成长点滴">
+<meta property="og:description" content="spring容器bean初始化问题">
+<meta property="og:updated_time" content="2016-09-17T09:06:48.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="OnlyGit-blog">
-<meta name="twitter:description" content="成长点滴">
+<meta name="twitter:title" content="spring容器bean初始化问题">
+<meta name="twitter:description" content="spring容器bean初始化问题">
 
 
 
@@ -110,7 +111,7 @@
   };
 </script>
 
-  <title> OnlyGit-blog </title>
+  <title> spring容器bean初始化问题 | OnlyGit-blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -131,9 +132,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -210,9 +209,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -232,10 +231,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2016/09/17/spring-load-order/" itemprop="url">
-                  spring容器bean初始化问题
-                </a>
+                spring容器bean初始化问题
               
             
           </h1>
@@ -275,334 +271,70 @@
       
 
       
-        
-          <hr>
-<p>spring容器bean初始化问题<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/09/17/spring-load-order/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+        <hr>
+<p>spring容器bean初始化问题<br><a id="more"></a></p>
+<p>背景：<br>spring项目中有两个类，内容如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MemoryCache</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        log.info(<span class="string">"CacheUtils....加载"</span>);</span><br><span class="line">        <span class="keyword">this</span>.refreshCache();</span><br><span class="line">		SpringContextUtil.getBean(...);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpringContextUtil</span> <span class="keyword">implements</span> <span class="title">ApplicationContextAware</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> ApplicationContext context = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setApplicationContext</span><span class="params">(ApplicationContext applicationContext)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        log.info(<span class="string">"ASpringContextUtil初始化........"</span>);</span><br><span class="line">        context = applicationContext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(String beanName,Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> context.getBean(beanName,clazz);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>MemoryCache实现了InitializingBean，在初始化后，会调用SpringContextUtil.getBean(…)加载spring容器中的其它bean。但是每次在项目启动时，都报空指针异常，原因就是spring调用afterPropertiesSet时，SpringContextUtil的context属性为null，也就是说，SpringContextUtil的初始化是在MemoryCache之后。有没有方法控制spring管理的bean的加载顺序呢？</p>
+<p>尝试的解决方法：</p>
+<ol>
+<li>官方文档中，有说明，@Order可以用于控制类的加载顺序，越小，越先加载，在尝试后没有效果</li>
+<li>修改SpringContextUtil类名，改为ASpringContextUtil，因为spring在扫描包时，按字母排序，ASpringContextUtil就在MemoryCache前面，ASpringContextUtil也就先加载。经测试，jdk1.7及以上都正常。但是jdk1.6中bean加载顺序还是没有生效。</li>
+<li>在MemoryCache中注入SpringContextUtil，afterPropertiesSet时是在所有属性注入后才被调用的，也就是说，在调用afterPropertiesSet之前，就会触发SpringContextUtil属性的初始化，顺理成章的先调用了setApplicationContext对context进行赋值。</li>
+</ol>
+<p>第二、三种方法都可行，但是第二种有jdk版本兼容问题。</p>
+
+      
+    </div>
+
+    <div>
+      
         
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/09/17/OS-Process/" itemprop="url">
-                  操作系统之进程
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-17T15:54:17+08:00" content="2016-09-17">
-              2016-09-17
-            </time>
-          </span>
-
+        <div class="post-tags">
           
-
-          
-            
-          
-
-          
-
-          
-          
-
+            <a href="/tags/spring/" rel="tag">#spring</a>
           
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <hr>
-<p>操作系统之进程简单介绍<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/09/17/OS-Process/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/17/OS-Process/" rel="next" title="操作系统之进程">
+                <i class="fa fa-chevron-left"></i> 操作系统之进程
+              </a>
+            
           </div>
-        
-      
-    </div>
 
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
+          <div class="post-nav-prev post-nav-item">
             
-            
-              
-                
-                <a class="post-title-link" href="/2016/07/14/Red-Black-Tree/" itemprop="url">
-                  Red-Black-Tree
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-14T00:54:17+08:00" content="2016-07-14">
-              2016-07-14
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <hr>
-<p>红黑树的基本特性和节点新增、删除算法介绍<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/14/Red-Black-Tree/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/06/25/hexo-github/" itemprop="url">
-                  hexo+github搭建博客
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-06-25T23:26:03+08:00" content="2016-06-25">
-              2016-06-25
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <hr>
-<p>GitHub＋Hexo搭建自己的博客项目<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/06/25/hexo-github/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
@@ -610,6 +342,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -629,8 +365,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -689,6 +434,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -785,6 +541,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

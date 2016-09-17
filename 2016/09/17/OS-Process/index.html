@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="操作系统," />
 
 
 
@@ -84,24 +84,16 @@
 
 
 
-<meta name="description" content="红黑树的基本特性和节点新增、删除算法介绍">
+<meta name="description" content="操作系统之进程简单介绍">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Red-Black-Tree">
-<meta property="og:url" content="http://yoursite.com/2016/07/14/Red-Black-Tree/index.html">
+<meta property="og:title" content="操作系统之进程">
+<meta property="og:url" content="http://yoursite.com/2016/09/17/OS-Process/index.html">
 <meta property="og:site_name" content="OnlyGit-blog">
-<meta property="og:description" content="红黑树的基本特性和节点新增、删除算法介绍">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/add_3.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/add_4.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/add_5.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/del_1.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/del_2.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/del_3.png">
-<meta property="og:image" content="http://yoursite.com/images/Red-Black/del_4.png">
-<meta property="og:updated_time" content="2016-07-28T15:40:04.000Z">
+<meta property="og:description" content="操作系统之进程简单介绍">
+<meta property="og:updated_time" content="2016-09-17T08:17:03.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Red-Black-Tree">
-<meta name="twitter:description" content="红黑树的基本特性和节点新增、删除算法介绍">
-<meta name="twitter:image" content="http://yoursite.com/images/Red-Black/add_3.png">
+<meta name="twitter:title" content="操作系统之进程">
+<meta name="twitter:description" content="操作系统之进程简单介绍">
 
 
 
@@ -119,7 +111,7 @@
   };
 </script>
 
-  <title> Red-Black-Tree | OnlyGit-blog </title>
+  <title> 操作系统之进程 | OnlyGit-blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -239,7 +231,7 @@
             
             
               
-                Red-Black-Tree
+                操作系统之进程
               
             
           </h1>
@@ -251,8 +243,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-14T00:54:17+08:00" content="2016-07-14">
-              2016-07-14
+            <time itemprop="dateCreated" datetime="2016-09-17T15:54:17+08:00" content="2016-09-17">
+              2016-09-17
             </time>
           </span>
 
@@ -280,36 +272,28 @@
 
       
         <hr>
-<p>红黑树的基本特性和节点新增、删除算法介绍<br><a id="more"></a></p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><strong>红黑树</strong>是自平衡的二叉查找树，有以下5个特性：</p>
+<p>操作系统之进程简单介绍<br><a id="more"></a></p>
+<p>很长时间了，一直在忙项目，前几天有空，回顾了下操作系统知识，随手总结了下进程、线程的相关基础，记下来，也方便查看。</p>
+<h1 id="内核空间和用户空间"><a href="#内核空间和用户空间" class="headerlink" title="内核空间和用户空间"></a>内核空间和用户空间</h1><p>现在操作系统都是采用虚拟存储器，那么对32位操作系统而言，它的寻址空间（虚拟存储空间）为4G（2的32次方）。操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证用户进程不能直接操作内核，保证内核的安全，操心系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间。针对linux操作系统而言，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF），供内核使用，称为内核空间，而将较低的3G字节（从虚拟地址0x00000000到0xBFFFFFFF），供各个进程使用，称为用户空间。每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，从具体进程的角度来看，每个进程可以拥有4G字节的虚拟空间，并且进程的空间地址是隔离的。</p>
+<h1 id="内核态与用户态："><a href="#内核态与用户态：" class="headerlink" title="内核态与用户态："></a>内核态与用户态：</h1><ol>
+<li>一个任务（进程）执行系统调用而陷入内核代码中执行时，称进程处于内核运行态（内核态）。此时处理器处于特权级最高的（0级）内核代码中执行。当进程处于内核态时，执行的内核代码会使用当前进程的内核栈。每个进程都有自己的内核栈。</li>
+<li>当进程在执行用户自己的代码时，则称其处于用户运行态（用户态）。此时处理器在特权级最低的（3级）用户代码中运行。当正在执行用户程序而突然被中断程序中断时，此时用户程序也可以象征性地称为处于进程的内核态。因为中断处理程序将使用当前进程的内核栈。</li>
+</ol>
+<h1 id="操作系统中线程的实现方式"><a href="#操作系统中线程的实现方式" class="headerlink" title="操作系统中线程的实现方式"></a>操作系统中线程的实现方式</h1><h2 id="内核支持线程"><a href="#内核支持线程" class="headerlink" title="内核支持线程"></a>内核支持线程</h2><p>内核支持线程是在内核支持下运行的，即无论是用户进程中的线程，还是系统进程中的线程，它们的创建、撤销和切换等也是依靠内核，在内核空间中实现的。</p>
 <ul>
-<li><strong>每个节点是红色或者黑色。</strong></li>
-<li><strong>根节点时黑色。</strong></li>
-<li><strong>每个叶子节点(NULL节点)都是黑色的(在普通的树中，叶子节点是没有子孙节点的节点)。</strong></li>
-<li><strong>如果一个节点时红色的，则它的两个字节点必须时黑色的。也就是说，在一条路径上不能连续出现两个红色节点。</strong></li>
-<li><strong>从任意一个节点到叶子节点的所有路径，都包含相同数目的黑色节点。</strong></li>
+<li>实现方式：系统在创建一个进程时，会为之分配一个任务数据区PTDA(Per Task Data Area)，其中包括若干个线程控制快TCB，操作系统在创建线程的时候，会为新线程分配一个TCB，在每个TCB中，会保存线程标识符、优先级、线程运行的CPU状态等信息。如果PTDA中的TCB用完了，而进程又要创建新的线程，只要其所创建的线程数目未超过系统的允许之，则系统可以分配新的TCB。在撤销一个线程的时候，也会回收对应的TCB空间。<br>可以看出，其实在创建用户线程时，会在内核中有一个对应的内核线程。</li>
+<li>优点：<br>在多核处理器中，同一进程中的多个线程可以并行执行；<br>如果进程中有一个线程阻塞了，不会影响其他线程执行；</li>
+<li>缺点：<br>对于用户级线程而言，模式切换开销较大。在同一进程中，从一个线程切换到另一个线程，需要从用户态切换到内核态。因为用户进程中的线程在用户态运行，而线程的调度和管理是在内核实现的。</li>
 </ul>
-<hr>
-<h2 id="插入新节点"><a href="#插入新节点" class="headerlink" title="插入新节点"></a>插入新节点</h2><blockquote>
-<p>假设新增的节点都是红色节点(为什么假设新增节点是红色的)：<br>如果新增的节点为黑色节点，必然会导致新节点所在路径上，黑色节点的数目多了一个，需要调整所有到子节点的路径中黑色节点的个数，而这时可能通过调整节点颜色保持红黑树特性，也可能即使调整了颜色，依然不能保持特性：比如树全是黑色节点的情况。<br>如果新增的节点是红色节点，可能导致新出现两个连续的红色节点，如果出现，有途径调整使其保持特性。</p>
-</blockquote>
-<p>在插入节点时到5种情况，以及每种情况下对应的处理方法：</p>
+<h2 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h2><p>用户级线程仅存在与用户空间中，对于这种线程的创建、撤销、线程间的同步等，都无需利用系统调用实现，而且内核完全不知道用户级线程的存在。<br>用户级线程都是在用户空间实现的，它们机构都相同，都运行在一个中间系统上。</p>
 <ul>
-<li><strong>1.插入的节点为根节点：</strong>把新节点作为跟节点，并设置颜色为黑色</li>
-<li><strong>2.插入的节点所在位置M的父节点P为黑色节点：</strong>直接插入就好，不用做调整</li>
-<li><strong>3.插入的节点所在位置M的父节点P为红色节点，并且该父节点P的兄弟节点U也是红色节点：</strong>将P、U颜色置为黑色节点，P的父节点G变为红色；操作完成后，G节点的情况与开始新增节点时的情况相同，所以需要把G当作之前的新节点那样，做同样的处理<br><img src="/images/Red-Black/add_3.png" alt="Alt text"></li>
-<li><strong>4.插入节点所在位置M的父节点P为红色节点，并且该父节点P的兄弟节点为黑色或为空节点，并且M为P的右子节点：</strong>以P为中心，做左旋操作，然后就变为情况5。<br>在插入新节点之前，红黑树节点都是合法的，如果新节点M为红色，M的父节点P也是红色，则P的父节点一定是黑色的，如果要保证红黑树特性，并且P的兄弟节点U不是红色，则U只能为空，如下图:<br><img src="/images/Red-Black/add_4.png" alt="Alt text"></li>
-<li><strong>5.插入节点所在位置M的父节点P为红色节点，并且该父节点P的兄弟节点为黑色或为空节点，并且M为P的左子节点：</strong>P设置为黑色，P的父节点G设置为红色，以G为中心，做右旋操作。根据4中的描述，情况5也只有一种情况，就是U为空节点，如图：<br><img src="/images/Red-Black/add_5.png" alt="Alt text"></li>
+<li>实现方式：<br>1）运行时系统<br>其实就是管理和控制线程的函数的集合组成的”系统”。包括创建、撤销、线程同步及通信的函数。正因为有这些函数，才使得用户级线程与内核无关，这些函数都驻留在用户空间。<br>2）轻量级进程(LWP)<br>在计算机操作系统中,轻量级进程（LWP）是一种实现多任务的方法。与普通进程相比，LWP与其他进程共享所有（或大部分）它的逻辑地址空间和系统资源；与线程相比，LWP有它自己的进程标识符，优先级，状态，以及栈和局部存储区，并和其他进程有着父子关系；<br>LWP可以通过系统调用来获得内核提供的服务，这样当一个用户级线程运行时，只要将它连接到一个LWP上，此时它便具有了内核支持线程的所有属性。</li>
 </ul>
-<h2 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h2><blockquote>
-<p>删除节点：<br>删除节点的过程：寻找一个可以替代被删除节点P的字节点N，将P的内容替换为N(颜色不变)，并将N删除。一般N就是P的右子树的最左侧节点或者左子树的最右侧节点。<br>下面默认用右子树的最左侧节点作为N，所以删除节点P其实是删除N。</p>
-</blockquote>
-<p>1.删除的节点N没有子节点<br>1.1如果N是红色，则直接删除<br>1.2如果N是黑色，删除后N所在路径黑色节点数目减少，需要调整<br>1.2.1如果N的兄弟节点B为红色节点，则B一定有两个子节点，并且两个子节点b1,b2一定是黑色节点。将B设置为黑色，N的父节点P设置为红色，然后以P为中心左旋转，则转换为情况1.2.2<br><img src="/images/Red-Black/del_1.png" alt="Alt text"></p>
-<p>1.2.2如果N的兄弟节点B为黑色节点，则B一定没有黑色的子节点。</p>
-<p>1.2.2.1如果N的兄弟节点没有节点：<br>将N的兄弟节点B变红，然后用N的父节点P作为新的N，进行递归操作。因为N是P的左子树，P的左子树路径中，删除N后，会缺少一个黑色节点，因此递归的将右树上的路径也减少一个黑色节点，知道N的颜色为红色。最后把当前的N节点置为黑色。最后产生的结果就是将右侧的黑色节点上移，这样右子树和左子树都没有减少黑色节点。<br><img src="/images/Red-Black/del_2.png" alt="Alt text"></p>
-<p>1.2.2.2如果N没有红色右子节点(后面会分析为什么这里以右子节点作为判断条件)<br>将B变红，b1变黑，然后以B为中心右旋，则转换为情况1.2.2.3<br><img src="/images/Red-Black/del_3.png" alt="Alt text"></p>
-<p>1.2.2.3如果N有红色的右子节点(不考虑左子节点，也就是说不用考虑b1是否存在)<br>将B的颜色设置为与P的颜色一致，然后P和b2设置为黑色，以P为中心左旋。<br><img src="/images/Red-Black/del_4.png" alt="Alt text"></p>
-<p>2.删除的节点N有子节点，那么一定只有右子节点R，过程是用右子节点R替换N，包括颜色替换，并将N删除。然后作颜色调整<br>2.1如果N是红色的，则R一定是黑色的，不做操作<br>2.2如果N是黑色的，R是红色的，则直接把R置为黑色即可<br>2.3如果N是黑色的，R也是黑色的，不会存在这种情况。因为前面确定N的时候，N为右子树的最左侧节点，所以N最多只有一个右子节点。如果N为黑色，且有一个子节点也为黑色，那么另一个子节点必须为黑色才行。而这里N最多只有一个右节点，所以不成立。</p>
+<ul>
+<li>优点：<br>线程切换不用进行状态切换，节省了开销；<br>用户级线程切换与操作系统平台无关，属于用户应用程序的一部分</li>
+<li>缺点：并发能力较差。在单纯的用户级线程实现中，多线程应用不能利用多处理器机制进行多重处理的优点。内核每次分配给一个进程的仅有一个CPU，因此进程中仅有一个线程能执行，在该线程放弃CPU之前，其他线程职能等待。</li>
+</ul>
+<h1 id="用户线程与LWP连接的三种模型及优缺点"><a href="#用户线程与LWP连接的三种模型及优缺点" class="headerlink" title="用户线程与LWP连接的三种模型及优缺点"></a>用户线程与LWP连接的三种模型及优缺点</h1><p>1）一对一模型<br>该模型为每个用户级线程都设置一个内核线程与之连接，并发能力较强，但没创建一个用户线程，都需要创建一个内核线程，<br>2）多对一模型<br>该模型为多个用户级线程分配一个内核线程。这样的话，线程管理的开销较小，但是当一个线程在访问内核时发生阻塞，则整个进程会被阻塞。<br>3）多对多模型<br>多个用户线程连接到多个内核线程上，内核控制线程的数目可以根据应用基础和系统的不同而变化，可以比用户线程少，也可以与之相同。</p>
 
       
     </div>
@@ -329,21 +313,27 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/操作系统/" rel="tag">#操作系统</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/06/25/hexo-github/" rel="next" title="hexo+github搭建博客">
-                <i class="fa fa-chevron-left"></i> hexo+github搭建博客
+              <a href="/2016/07/14/Red-Black-Tree/" rel="next" title="Red-Black-Tree">
+                <i class="fa fa-chevron-left"></i> Red-Black-Tree
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/09/17/OS-Process/" rel="prev" title="操作系统之进程">
-                操作系统之进程 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/09/17/spring-load-order/" rel="prev" title="spring容器bean初始化问题">
+                spring容器bean初始化问题 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -467,7 +457,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入新节点"><span class="nav-number">2.</span> <span class="nav-text">插入新节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除节点"><span class="nav-number">3.</span> <span class="nav-text">删除节点</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#内核空间和用户空间"><span class="nav-number">1.</span> <span class="nav-text">内核空间和用户空间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内核态与用户态："><span class="nav-number">2.</span> <span class="nav-text">内核态与用户态：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#操作系统中线程的实现方式"><span class="nav-number">3.</span> <span class="nav-text">操作系统中线程的实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#内核支持线程"><span class="nav-number">3.1.</span> <span class="nav-text">内核支持线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户级线程"><span class="nav-number">3.2.</span> <span class="nav-text">用户级线程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户线程与LWP连接的三种模型及优缺点"><span class="nav-number">4.</span> <span class="nav-text">用户线程与LWP连接的三种模型及优缺点</span></a></li></ol></div>
             
           </div>
         </section>
