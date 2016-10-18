@@ -1,0 +1,570 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="spring整合ES之scroll问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="踩坑系列之ES-scroll问题">
+<meta property="og:url" content="http://yoursite.com/2016/10/17/ES-scroll-issues/index.html">
+<meta property="og:site_name" content="OnlyGit-blog">
+<meta property="og:description" content="spring整合ES之scroll问题">
+<meta property="og:updated_time" content="2016-10-18T00:33:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="踩坑系列之ES-scroll问题">
+<meta name="twitter:description" content="spring整合ES之scroll问题">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 踩坑系列之ES-scroll问题 | OnlyGit-blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">OnlyGit-blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                踩坑系列之ES-scroll问题
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-17T23:41:33+08:00" content="2016-10-17">
+              2016-10-17
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <hr>
+<p>spring整合ES之scroll问题<br><a id="more"></a></p>
+<p>环境:：<br>ES：2.4.0<br>spring-data-elasticsearch：2.0.0</p>
+<h2 id="ES异常："><a href="#ES异常：" class="headerlink" title="ES异常："></a>ES异常：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RemoteTransportException[[node1][xx.xx.xx.xx:<span class="number">9300</span>][indices:data/read/search[phase/scan/scroll]]]; nested: SearchContextMissingException[No search contex</span><br><span class="line">t found <span class="keyword">for</span> id [<span class="number">697334</span>]];</span><br><span class="line">Caused by: SearchContextMissingException[No search context found <span class="keyword">for</span> id [<span class="number">697334</span>]]</span><br><span class="line">…..</span><br></pre></td></tr></table></figure>
+<p>详细描述：在使用spring封装的ElasticSearchTemplate做删除操作时，总是抛出异常，经过定位，发现ElasticSearchTemplate在删除数据时，会先批量的进行查询操作，然后根据获取的文档ID列表，进行批量删除操作。具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(DeleteQuery deleteQuery, Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	String indexName = isNotBlank(deleteQuery.getIndex()) ? deleteQuery.getIndex() : getPersistentEntityFor(clazz).getIndexName();</span><br><span class="line">	String typeName = isNotBlank(deleteQuery.getType()) ? deleteQuery.getType() : getPersistentEntityFor(clazz).getIndexType();</span><br><span class="line">	Integer pageSize = deleteQuery.getPageSize() != <span class="keyword">null</span> ? deleteQuery.getPageSize() : <span class="number">1000</span>;</span><br><span class="line">	Long scrollTimeInMillis = deleteQuery.getScrollTimeInMillis() != <span class="keyword">null</span> ? deleteQuery.getScrollTimeInMillis() : <span class="number">10000l</span>;</span><br><span class="line"></span><br><span class="line">	SearchQuery searchQuery = <span class="keyword">new</span> NativeSearchQueryBuilder().withQuery(deleteQuery.getQuery())</span><br><span class="line">			.withIndices(indexName)</span><br><span class="line">			.withTypes(typeName)</span><br><span class="line">			.withPageable(<span class="keyword">new</span> PageRequest(<span class="number">0</span>, pageSize))</span><br><span class="line">			.build();</span><br><span class="line"></span><br><span class="line">	String scrollId = scan(searchQuery, scrollTimeInMillis, <span class="keyword">true</span>);</span><br><span class="line">	<span class="comment">/**</span><br><span class="line">     * scan内部主要逻辑</span><br><span class="line">     * 调用了scroll查询</span><br><span class="line">     */</span></span><br><span class="line">    <span class="comment">/*SearchRequestBuilder requestBuilder = client.prepareSearch(toArray(query.getIndices())).setSearchType(SCAN)</span><br><span class="line">            .setTypes(toArray(query.getTypes()))</span><br><span class="line">            .setScroll(TimeValue.timeValueMillis(scrollTimeInMillis)).setFrom(0)</span><br><span class="line">            .setSize(query.getPageable().getPageSize());*/</span></span><br><span class="line"></span><br><span class="line">	BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();</span><br><span class="line">	List&lt;String&gt; ids = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">	<span class="keyword">boolean</span> hasRecords = <span class="keyword">true</span>;</span><br><span class="line">	<span class="keyword">while</span> (hasRecords) &#123;</span><br><span class="line">		Page&lt;String&gt; page = scroll(scrollId, scrollTimeInMillis, <span class="keyword">new</span> SearchResultMapper() &#123;</span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="keyword">public</span> &lt;T&gt; <span class="function">Page&lt;T&gt; <span class="title">mapResults</span><span class="params">(SearchResponse response, Class&lt;T&gt; clazz, Pageable pageable)</span> </span>&#123;</span><br><span class="line">				List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">				<span class="keyword">for</span> (SearchHit searchHit : response.getHits()) &#123;</span><br><span class="line">					String id = searchHit.getId();</span><br><span class="line">					result.add(id);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">if</span> (result.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">					<span class="keyword">return</span> <span class="keyword">new</span> PageImpl&lt;T&gt;((List&lt;T&gt;) result);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line">		<span class="keyword">if</span> (page != <span class="keyword">null</span> &amp;&amp; page.getContent().size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			ids.addAll(page.getContent());</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			hasRecords = <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(String id : ids) &#123;</span><br><span class="line">		bulkRequestBuilder.add(client.prepareDelete(indexName, typeName, id));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(bulkRequestBuilder.numberOfActions() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		bulkRequestBuilder.execute().actionGet();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	clearScroll(scrollId);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="问题定位："><a href="#问题定位：" class="headerlink" title="问题定位："></a>问题定位：</h2><p>根据异常可看出，是在进行scroll查询时出错，然后去翻了官方文档(<a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search-scrolling.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/java-search-scrolling.html</a>)，找出了scroll查询demo：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">QueryBuilder qb = termQuery(<span class="string">"multi"</span>, <span class="string">"test"</span>);</span><br><span class="line"></span><br><span class="line">SearchResponse scrollResp = client.prepareSearch(test)</span><br><span class="line">        .addSort(SortParseElement.DOC_FIELD_NAME, SortOrder.ASC)</span><br><span class="line">        .setScroll(<span class="keyword">new</span> TimeValue(<span class="number">60000</span>))</span><br><span class="line">        .setQuery(qb)</span><br><span class="line">        .setSize(<span class="number">100</span>).execute().actionGet(); <span class="comment">//100 hits per shard will be returned for each scroll</span></span><br><span class="line"><span class="comment">//Scroll until no hits are returned</span></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (SearchHit hit : scrollResp.getHits().getHits()) &#123;</span><br><span class="line">        <span class="comment">//Handle the hit...</span></span><br><span class="line">    &#125;</span><br><span class="line">    scrollResp = client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(<span class="keyword">new</span> TimeValue(<span class="number">60000</span>)).execute().actionGet();</span><br><span class="line">    <span class="comment">//Break condition: No hits are returned</span></span><br><span class="line">    <span class="keyword">if</span> (scrollResp.getHits().getHits().length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>反复对比代码，进行debug，并实时查看es日志，最终发现了错误原因：client.prepareSearch(toArray(query.getIndices())).setSearchType(SCAN)，<br>设置了searchType=SCAN后，执行第一次查询，返回的response中，只包含了一些元数据，比如total，scrollId等(hits为空)，在for循环中，再次用scroll查询，返回的结果会包含hits，但是scrollId却发生了变化。下次循环中，如果再用之前的scrollId，就会报错。<br>如果不设置searchType，默认的为query_then_fetch，每次都scroll查询，返回的response中的scrollId都是一样的。</p>
+<h2 id="分析过程"><a href="#分析过程" class="headerlink" title="分析过程"></a>分析过程</h2><p>基于ElasticSearchTemplate源码稍做修改：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> ElasticsearchTemplate elasticsearchTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(DeleteQuery deleteQuery, Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">    String indexName = isNotBlank(deleteQuery.getIndex()) ? deleteQuery.getIndex() : elasticsearchTemplate.getPersistentEntityFor(clazz).getIndexName();</span><br><span class="line">    String typeName = isNotBlank(deleteQuery.getType()) ? deleteQuery.getType() : elasticsearchTemplate.getPersistentEntityFor(clazz).getIndexType();</span><br><span class="line">    Integer pageSize = deleteQuery.getPageSize() != <span class="keyword">null</span> ? deleteQuery.getPageSize() : <span class="number">2</span>;</span><br><span class="line">    Long scrollTimeInMillis = deleteQuery.getScrollTimeInMillis() != <span class="keyword">null</span> ? deleteQuery.getScrollTimeInMillis() : <span class="number">60000l</span>;</span><br><span class="line"></span><br><span class="line">    SearchQuery searchQuery = <span class="keyword">new</span> NativeSearchQueryBuilder().withQuery(deleteQuery.getQuery())</span><br><span class="line">            .withIndices(indexName)</span><br><span class="line">            .withTypes(typeName)</span><br><span class="line">            .withPageable(<span class="keyword">new</span> PageRequest(<span class="number">0</span>, pageSize))</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line"><span class="comment">//        String scrollId = elasticsearchTemplate.scan(searchQuery, scrollTimeInMillis, true);</span></span><br><span class="line"></span><br><span class="line">    SearchResponse scrollResp = elasticsearchTemplate.getClient().prepareSearch(<span class="string">"my_index"</span>)</span><br><span class="line">            .setTypes(<span class="string">"my_type"</span>).setSearchType(SCAN)</span><br><span class="line">            .setScroll(<span class="keyword">new</span> TimeValue(<span class="number">60000</span>))</span><br><span class="line">            .setQuery(searchQuery.getQuery())</span><br><span class="line">            .setSize(<span class="number">20</span>).execute().actionGet(); <span class="comment">//100 hits per shard will be returned for each scroll</span></span><br><span class="line"></span><br><span class="line">    List&lt;String&gt; ids = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; <span class="number">3</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (SearchHit hit : scrollResp.getHits().getHits()) &#123;</span><br><span class="line">            System.out.println(hit.getId());</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"--------"</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(scrollResp.getScrollId());</span><br><span class="line">        scrollResp = elasticsearchTemplate.getClient().prepareSearchScroll(scrollResp.getScrollId()).setScroll(<span class="keyword">new</span> TimeValue(<span class="number">60000</span>)).execute().actionGet();</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    elasticsearchTemplate.clearScroll(scrollResp.getScrollId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在测试场景中，总共有5条数据(小括号里的内容不是打印出来的，scrollId是经过base64编码的，放在括号里可以清晰地看到真实参数)<br>1）searchType=Scan<br>结果如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">--------</span><br><span class="line">c2Nhbjs1OzY5NzMyNTpKUTVRWHZkaVJJS2tkN1NlLUlUWWZ3OzY5NzMyNjpKUTVRWHZkaVJJS2tkN1NlLUlUWWZ3OzEwNDczOkdOMHR2MmVTVHpHdG0zcElibkFDR1E7Njk3MzI3OkpRNVFYdmRpUklLa2Q3U2UtSVRZZnc7MTA0NzQ6R04wdHYyZVNUekd0bTNwSWJuQUNHUTsxO3RvdGFsX2hpdHM6NTs=(scan;5;697325:JQ5QXvdiRIKkd7Se-ITYfw;697326:JQ5QXvdiRIKkd7Se-ITYfw;10473:GN0tv2eSTzGtm3pIbnACGQ;697327:JQ5QXvdiRIKkd7Se-ITYfw;10474:GN0tv2eSTzGtm3pIbnACGQ;1;total_hits:5;)</span><br><span class="line">780741388186562560</span><br><span class="line">780739400715612160</span><br><span class="line">780741233156698112</span><br><span class="line">780739471146364928</span><br><span class="line">780740872433971200</span><br><span class="line">--------</span><br><span class="line">c2NhbjswOzE7dG90YWxfaGl0czo1Ow==(scan;0;1;total_hits:5;)</span><br><span class="line">--------</span><br><span class="line">c2NhbjswOzE7dG90YWxfaGl0czo1Ow==(scan;0;1;total_hits:5;)</span><br></pre></td></tr></table></figure></p>
+<p>2）searchType=默认<br>结果如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">780741233156698112</span></span><br><span class="line"><span class="number">780739471146364928</span></span><br><span class="line"><span class="number">780740872433971200</span></span><br><span class="line"><span class="number">780739400715612160</span></span><br><span class="line"><span class="number">780741388186562560</span></span><br><span class="line">--------</span><br><span class="line">cXVlcnlUaGVuRmV0Y2g7NTs2OTczMzA6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzs2OTczMzI6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzsxMDQ3OTpHTjB0djJlU1R6R3RtM3BJYm5BQ0dROzY5NzMzMTpKUTVRWHZkaVJJS2tkN1NlLUlUWWZ3OzEwNDc4OkdOMHR2MmVTVHpHdG0zcElibkFDR1E7MDs=(queryThenFetch;<span class="number">5</span>;<span class="number">697330</span>:JQ5QXvdiRIKkd7Se-ITYfw;<span class="number">697332</span>:JQ5QXvdiRIKkd7Se-ITYfw;<span class="number">10479</span>:GN0tv2eSTzGtm3pIbnACGQ;<span class="number">697331</span>:JQ5QXvdiRIKkd7Se-ITYfw;<span class="number">10478</span>:GN0tv2eSTzGtm3pIbnACGQ;<span class="number">0</span>;)</span><br><span class="line">--------</span><br><span class="line">cXVlcnlUaGVuRmV0Y2g7NTs2OTczMzA6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzs2OTczMzI6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzsxMDQ3OTpHTjB0djJlU1R6R3RtM3BJYm5BQ0dROzY5NzMzMTpKUTVRWHZkaVJJS2tkN1NlLUlUWWZ3OzEwNDc4OkdOMHR2MmVTVHpHdG0zcElibkFDR1E7MDs=</span><br><span class="line">--------</span><br><span class="line">cXVlcnlUaGVuRmV0Y2g7NTs2OTczMzA6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzs2OTczMzI6SlE1UVh2ZGlSSUtrZDdTZS1JVFlmdzsxMDQ3OTpHTjB0djJlU1R6R3RtM3BJYm5BQ0dROzY5NzMzMTpKUTVRWHZkaVJJS2tkN1NlLUlUWWZ3OzEwNDc4OkdOMHR2MmVTVHpHdG0zcElibkFDR1E7MDs=</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，SCAN类型的searchType，scroll查询后，scrollId会发生变化，如果下次查询，还用之前返回的scrollId(结果1中的第2行)，就会报文章描述的错误。而默认的searchType每次查询返回的scrollId则是相同的。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(DeleteQuery deleteQuery, Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">    String indexName = isNotBlank(deleteQuery.getIndex()) ? deleteQuery.getIndex() : elasticsearchTemplate.getPersistentEntityFor(clazz).getIndexName();</span><br><span class="line">    String typeName = isNotBlank(deleteQuery.getType()) ? deleteQuery.getType() : elasticsearchTemplate.getPersistentEntityFor(clazz).getIndexType();</span><br><span class="line">    Integer pageSize = deleteQuery.getPageSize() != <span class="keyword">null</span> ? deleteQuery.getPageSize() : <span class="number">1000</span>;</span><br><span class="line">    Long scrollTimeInMillis = deleteQuery.getScrollTimeInMillis() != <span class="keyword">null</span> ? deleteQuery.getScrollTimeInMillis() : <span class="number">10000l</span>;</span><br><span class="line"></span><br><span class="line">    SearchResponse scrollResp = getClient().prepareSearch(indexName)</span><br><span class="line">            .setTypes(typeName)</span><br><span class="line">            .setScroll(<span class="keyword">new</span> TimeValue(scrollTimeInMillis))</span><br><span class="line">            .setQuery(deleteQuery.getQuery())</span><br><span class="line">            .setSize(pageSize).execute().actionGet();</span><br><span class="line"></span><br><span class="line">    BulkRequestBuilder bulkRequestBuilder = getClient().prepareBulk();</span><br><span class="line">    List&lt;String&gt; ids = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (SearchHit hit : scrollResp.getHits().getHits()) &#123;</span><br><span class="line">            ids.add(hit.getId());</span><br><span class="line">        &#125;</span><br><span class="line">        scrollResp = getClient().prepareSearchScroll(scrollResp.getScrollId()).</span><br><span class="line">                setScroll(<span class="keyword">new</span> TimeValue(scrollTimeInMillis)).execute().actionGet();</span><br><span class="line">        <span class="comment">//Break condition: No hits are returned</span></span><br><span class="line">        <span class="keyword">if</span> (scrollResp.getHits().getHits().length == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(String id : ids) &#123;</span><br><span class="line">        bulkRequestBuilder.add(getClient().prepareDelete(indexName, typeName, id));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(bulkRequestBuilder.numberOfActions() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        bulkRequestBuilder.execute().actionGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//默认都searchType=queryThenFetch，每次请求，返回的scrollId都一样，这里只用删除一个</span></span><br><span class="line">    elasticsearchTemplate.clearScroll(scrollResp.getScrollId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>(其实在ES2.4版本中，SearchType.SCAN就已经被Deprecated，而在spring-data-elasticsearch中，还在使用)</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/17/spring-load-order/" rel="next" title="spring容器bean初始化问题">
+                <i class="fa fa-chevron-left"></i> spring容器bean初始化问题
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/Iversen.jpg"
+               alt="John Doe" />
+          <p class="site-author-name" itemprop="name">John Doe</p>
+          <p class="site-description motion-element" itemprop="description">不断学习，超越自己</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/OnlyGit" target="_blank" title="GitHub">
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://my.csdn.net/x_qiang_d" target="_blank" title="CSDN">
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ES异常："><span class="nav-number">1.</span> <span class="nav-text">ES异常：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题定位："><span class="nav-number">2.</span> <span class="nav-text">问题定位：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析过程"><span class="nav-number">3.</span> <span class="nav-text">分析过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">4.</span> <span class="nav-text">解决方法</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
