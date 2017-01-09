@@ -1,0 +1,614 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="操作系统中，进程的相关概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统概念笔记-进程篇(一)">
+<meta property="og:url" content="http://yoursite.com/2017/01/06/OSC-Notes-Process-First/index.html">
+<meta property="og:site_name" content="Joe's blog">
+<meta property="og:description" content="操作系统中，进程的相关概念">
+<meta property="og:image" content="http://yoursite.com/images/OSC/process_state.png">
+<meta property="og:updated_time" content="2017-01-09T14:35:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="操作系统概念笔记-进程篇(一)">
+<meta name="twitter:description" content="操作系统中，进程的相关概念">
+<meta name="twitter:image" content="http://yoursite.com/images/OSC/process_state.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 操作系统概念笔记-进程篇(一) | Joe's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Joe's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                操作系统概念笔记-进程篇(一)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-01-06T23:41:33+08:00" content="2017-01-06">
+              2017-01-06
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>操作系统中，进程的相关概念<br><a id="more"></a></p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;《操作系统概念》是一本经典书籍，在阅读之前，也搜过很多书评，大多都在吐槽中文版的各种缺点。其实并不是我们的翻译人员翻译地不好，而是同一句话，每个人都有自己的理解，译者以自己的方式表达出来，读者有迷惑也实属正常。之前也看过一些翻译的书籍，也遇到这种问题，读起来很拗口。于是下决心读原版书籍，也作为英语阅读的第一步吧。因为之前操作系统也有一些基础，在开始阅读时相对顺畅些，很多单词也能猜出个大概。所以也推荐大家，刚开始英语阅读的时候，可以选一些翻译书的原版，不至于被词汇量打击信心。慢慢的大脑就会适应，关键还是在于最初的坚持。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;之前读书，其实很少做笔记，每次忘了都是再翻书。也知道做笔记有很多好处，归根结底就是懒。但在读这本书的时候，直接查找需要复习的内容就难了，满屏幕的英文……不好查找。所以也就借着这个机会，培养做笔记的习惯。新年第一篇，从进程入手。之前也写过一篇跟进程相关的文章，以后会合并到笔记中。</p>
+<hr>
+<h2 id="进程是什么"><a href="#进程是什么" class="headerlink" title="进程是什么"></a>进程是什么</h2><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;一个正在执行的程序。程序的本质其实就是文本块，它本身是静态的，比如说一个可执行文件中，包含了一些计算机的指令，这个文件就可以看作一个程序。而进程是动态的，它包含了程序计数器、会使用到的相关资源等等，它描述的是程序的一个执行过程。同一个程序，可以产生多个不同的进程。</p>
+<h3 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;一个进程在执行过程中，状态也会发生变化。一个进程的状态可能包括：新建、执行、等待、就绪、终止。状态流转图：<br><img src="/images/OSC/process_state.png" alt="Alt text"></p>
+<blockquote>
+<p>注：不同的操作系统，可能对进程的定义也不同。但是上述这些状态，在所有操作系统中都有。</p>
+</blockquote>
+<h3 id="PCB"><a href="#PCB" class="headerlink" title="PCB"></a>PCB</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;在操作系统中，每一个进程，都有一个唯一标识——进程控制块（PCB），它包含的信息有：</p>
+<ul>
+<li>进程的状态。</li>
+<li>程序计数器：保存下一条会被执行的指令。</li>
+<li>CPU寄存器：不同的操作系统，寄存器的个数和类型可能不同。它们包括累加器，索引寄存器，堆栈指针和通用寄存器，以及代码信息。与程序计数器一起，当中断发生时，必须保存该状态信息，以允许在此之后被继续正确地执行。</li>
+<li>CPU调度信息：保存了进程的优先级信息，指向调度队列的指针，以及一些调度会用到的参数。</li>
+<li>内存管理信息：页、表、段等信息，可能会在换入换出时用到。</li>
+<li>账户信息：包括系统cpu数目和使用情况，登录的账户数量，进程数量等等。</li>
+<li>I/O状态信息：分配给进程的I/O设备，文件列表等。</li>
+</ul>
+<h2 id="进程调度"><a href="#进程调度" class="headerlink" title="进程调度"></a>进程调度</h2><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;引入多进程的目的，其实是为了最大化的使用CPU。CPU频繁地在各个进程间进行切换，让用户感觉每个进程都在不停的运行，可以提高交互体验。为了满足这些需求，引入了进程调度器。调度器会选择已就绪的进程，让CPU去执行。当进程进入系统时，它们被放在作业队列中，这个队列包括系统中的所有进程。驻留在主存中并且准备执行的进程，被保存在就绪队列中（通常为链表结构）。当一个进程被分配CPU时，它执行一段时间，最终退出，被中断，或等待特定事件的发生(比如I/O请求)。</p>
+<h3 id="调度器"><a href="#调度器" class="headerlink" title="调度器"></a>调度器</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;进程在其生命中期中不断在调度队列之间迁移。操作系统必须以调度为目的，并以某种方式从这些队列中选择进程。调度器正是来执行选择进程的操作的。下面是调度器的几个调度算法(它们之间的基本区别，在于执行的频率上)：</p>
+<ul>
+<li>长期调度：维持内存中的线程个数，在一个稳定的水平。执行频率较低，在选择进程时，要维持I/O bound和CPU bound两种类型进程数量的平衡。在分时系统中可能不会用到。</li>
+<li>短期调度：为CPU提供新的进程，执行频率较高。</li>
+<li>中期调度：又称为交换调度。它的核心思想是能将进程从内存或从CPU竞争中移出，从而降低多道程序设计的程度，之后进程能被重新调入内存，并从中断处继续执行。</li>
+</ul>
+<h3 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;当cpu切换到其他进程时，需要执行当前进程状态的保存以及其他进程的状态恢复，这个任务就叫做上下文切换。当上下文切换发生时，内核会将当前线程的上下文信息保存在PCB中，并加载之前保存的进程，进行调度。另外注意的是，在cpu执行上下文切换期间，不会执行其他工作，因此上下文切换时间是纯开销。上下文切换的时间，跟很多因素有关，比如内存的读写速度，需要保存的上下文数据的大小等。</p>
+<h2 id="进程的创建和终止"><a href="#进程的创建和终止" class="headerlink" title="进程的创建和终止"></a>进程的创建和终止</h2><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;在大多数操作系统中，进程可以并发执行，可以动态的被创建和删除。这类系统，就需要提供进程的创建和删除机制。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;进程在执行过程中，也可以创建新的进程。执行创建进程的进程与新建的进程之间存在父子关系。新建的进程又可以创建进程，最终会形成一个树形结构。大多数的操作系统，为进程分配一个唯一的id(pid).通过pid可以实现访问进程中的各种信息。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;当进程创建子进程后，子进程同样需要一些基本的资源，比如cpu时间，内存等。子进程可以直接从操作系统获取资源，也可以获取父进程中的部分资源，这样的话，父进程就要提供出一部分资源工子进程使用，或者与子进程共享一些资源。通过限制子进程访问父进程的资源，可以防止父进程创建过多的进程。除了提供一些资源外，父进程可能会给子进程传递着数据。</p>
+<h3 id="进程的创建"><a href="#进程的创建" class="headerlink" title="进程的创建"></a>进程的创建</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;当进程创建了新的进程后，从进程执行的角度，可以分为:</p>
+<ul>
+<li>父子进程并发执行。</li>
+<li>父进程等待某些或者所有的子进程结束后再执行。</li>
+</ul>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;从地址空间看，也存在两种情况:</p>
+<ul>
+<li>子进程是父进程的副本，子进程的地址空间中的程序和数据都与父进程一样。</li>
+<li>子进程加载新的程序到地址空间中。</li>
+</ul>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;我们可以看个例子。在Unix中，fork函数可以创建一个新的进程。新进程的地址空间中，就是父进程的地址的拷贝(但是地址空间是不同的，除了少数的内容以外，其他的都是一样的，相当于复制操作)。这种机制使父子进程通信更容易。在调用fork()之后，两个进程都从fork()后继续执行。唯一不同的是，父进程返回的pid&gt;0，而子进程返回的pid=0。示例代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	pid t pid;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* fork a child process */</span></span><br><span class="line">    pid = fork();</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">if</span> (pid &lt; <span class="number">0</span>) &#123; </span><br><span class="line">		<span class="comment">/* error occurred */</span></span><br><span class="line">		<span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"Fork Failed"</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">/* child process */</span></span><br><span class="line">		execlp(<span class="string">"/bin/ls"</span>,<span class="string">"ls"</span>,<span class="literal">NULL</span>);</span><br><span class="line">	&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">/* parent process */</span></span><br><span class="line">		<span class="comment">/* parent will wait for the child to complete */</span></span><br><span class="line">		wait(<span class="literal">NULL</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"Child Complete"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;在代码中，我们根据返回值pid区分父子进程。在调用fork()之前只有一个进程执行，之后就有两个进程，可以根据pid区分。可以看到，子进程的地址空间会被覆盖掉，因为它执行了execlp系统调用。而父进程执行了wait(),会等待子进程结束。当子进程结束后(隐式或显式地调用exit())，父进程就会恢复并继续执行。当然，子进程也可以不进行任何系统调用，这样的话，子进程就是父进程的拷贝，每个进程都有自己的数据。比如说我们可以在代码中去掉if判断，执行相同的逻辑。</p>
+<h3 id="进程的终止"><a href="#进程的终止" class="headerlink" title="进程的终止"></a>进程的终止</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;当进程执行后，会通过调用exit()请求操作系统来删除自己，此时，进程会返回一个状态值给父进程(父进程调用过wait())。分配给改进程的所有都会被操作系统回收。当然，一个进程也可以终止其他进程，比如在Windows中调用TerminateProcess()，但是通常情况下，只允许父进程终止子进程，要不然等话，用户就可以随意终止其他进程了。</p>
+<h3 id="僵尸进程和孤儿进程"><a href="#僵尸进程和孤儿进程" class="headerlink" title="僵尸进程和孤儿进程"></a>僵尸进程和孤儿进程</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;进程终止后，它所占用的资源都会被操作系统回收，但在操作系统中的进程表中，仍存在一个表项(PCB)，之所以没存在时因为进程表需要保存进程的“退出”状态信息，直到父进程执行了wait()调用，才被移除。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;如果一个进程终止了，但是其父进程还没有调用wait()，这个进程称为<strong>僵尸进程</strong>。其实所有的进程在终止后，都会转换到这种状态的。一旦父进程调用了wait()，进程id和进程表中的条目就被释放。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>孤儿进程</strong>：如果父进程没有调用wait()就终止，而进程依然在正常执行。Linux和unix中，操作系统会将init进程作为孤儿进程的父进程，定期调用wait()。</p>
+<h2 id="进程通信"><a href="#进程通信" class="headerlink" title="进程通信"></a>进程通信</h2><h3 id="基础的通信模型"><a href="#基础的通信模型" class="headerlink" title="基础的通信模型"></a>基础的通信模型</h3><ul>
+<li>共享内存：通常，共享存储器区域驻留在创建共享存储器段的过程的地址空间中。希望使用此共享内存段进行通信的其他进程必须将其附加到它们的地址空间。我们知道，进程的空间地址都是独立的，操作系统会阻止某个进程访问其他进程的内存。但是在共享内存中，是没有这种限制的，进程间可以通过读写共享内存实现通信。共享内存块不是由操作系统控制的，它的数据格式、并发访问控制都是由进程自己控制的。</li>
+<li>信息传递：<ol>
+<li>直接传递，发送时指定要接收的进程；接收时指定发送消息的进程；这种可能存在硬编码</li>
+<li>间接传递，统一将消息发送到mailbox中(mailbox可能属于进程，也可能属于操作系统)</li>
+</ol>
+</li>
+</ul>
+<p>优缺点：<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;信息传递可用与交换少量数据，因为不存在数据竞争。信息传递相对共享内存实现比较容易。但共享内存的要快于信息传递，因为信息传递需要系统调用，会存在内核干预，带来较高的延迟，而共享内存只在内存建立的时候会有系统调用。</p>
+<h3 id="C-S系统间的通信其他通信方式"><a href="#C-S系统间的通信其他通信方式" class="headerlink" title="C-S系统间的通信其他通信方式"></a>C-S系统间的通信其他通信方式</h3><p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;上述的两种基本的通信方式，也可用于C-S系统中，另外以下三种策略也经常被用到：</p>
+<ul>
+<li>socket，即IP+端口。通常被看作低级形式，因为在通信过程中，采用的是非结构化的字节流。</li>
+<li>RPC，在RPC通信过程中，数据都是格式化的。每个消息都被传送至远程服务中监听消息的守护线程中，并且每个消息都包含了用于区分调用哪个方法的标识和需要传递给对应方法的参数。在对应的方法请求后，再以一个单独的消息作为返回信息。<br>RPC中应该注意的问题：<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>正好被执行一次</strong>：先考虑如何做到“最多执行一次”，可以在消息中加入额外的参数，比如时间戳，服务端保留调用记录，如果在记录中根据时间戳可以查到消息，表明已经处理过，可以忽略当前请求。正好被执行一次，就是在“最多执行一次”的基础上，保证消息的可靠传输，即确保服务方确实接收到了消息。方法有很多，比如ACK，调用方可以在收到服务方的ACK之前，定期的执行RPC调用。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>连接的建立</strong>，有两种方式。一种是硬编码，调用方事先知道服务方的端口，在通信期间，服务方的端口不能改变。另一种是通过中间层动态地绑定，调用方通过从中间层获取的获取服务方的端口信息，进行远程调用。</li>
+<li>管道：<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>普通管道</strong>：单向的，要么读，要么写。在Unix和Windows中，普通管道要求通信的两个进程存在父子关系，这也就意味着，用这种管道进行通信的进程，必须在同一台计算机中。<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<strong>命名管道</strong>：相比普通管道，功能更强大。命名管道提供双向通信，不存在进程间必须是父子关系的限制。管道被建立后，可用于多个进程。甚至在某些特定场景中，一个管道会有多个写入的进程。在进程退出后，管道依然存在，而普通管道在进程退出后，也会退出。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/17/ES-scroll-issues/" rel="next" title="踩坑系列之ES-scroll问题">
+                <i class="fa fa-chevron-left"></i> 踩坑系列之ES-scroll问题
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/Iversen.jpg"
+               alt="Joe" />
+          <p class="site-author-name" itemprop="name">Joe</p>
+          <p class="site-description motion-element" itemprop="description">要改变现状，首先要改变自己；要改变自己，先要改变我们对问题的看法</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/OnlyGit" target="_blank" title="GitHub">
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://my.csdn.net/x_qiang_d" target="_blank" title="CSDN">
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#进程是什么"><span class="nav-number">1.</span> <span class="nav-text">进程是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程的状态"><span class="nav-number">1.1.</span> <span class="nav-text">进程的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PCB"><span class="nav-number">1.2.</span> <span class="nav-text">PCB</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程调度"><span class="nav-number">2.</span> <span class="nav-text">进程调度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调度器"><span class="nav-number">2.1.</span> <span class="nav-text">调度器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文切换"><span class="nav-number">2.2.</span> <span class="nav-text">上下文切换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程的创建和终止"><span class="nav-number">3.</span> <span class="nav-text">进程的创建和终止</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程的创建"><span class="nav-number">3.1.</span> <span class="nav-text">进程的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程的终止"><span class="nav-number">3.2.</span> <span class="nav-text">进程的终止</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#僵尸进程和孤儿进程"><span class="nav-number">3.3.</span> <span class="nav-text">僵尸进程和孤儿进程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程通信"><span class="nav-number">4.</span> <span class="nav-text">进程通信</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础的通信模型"><span class="nav-number">4.1.</span> <span class="nav-text">基础的通信模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C-S系统间的通信其他通信方式"><span class="nav-number">4.2.</span> <span class="nav-text">C-S系统间的通信其他通信方式</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

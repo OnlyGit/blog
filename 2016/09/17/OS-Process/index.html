@@ -90,7 +90,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/09/17/OS-Process/index.html">
 <meta property="og:site_name" content="Joe's blog">
 <meta property="og:description" content="操作系统之进程简单介绍">
-<meta property="og:updated_time" content="2016-09-17T08:17:03.000Z">
+<meta property="og:updated_time" content="2017-01-09T14:12:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="操作系统之进程">
 <meta name="twitter:description" content="操作系统之进程简单介绍">
@@ -285,15 +285,15 @@
 <li>优点：<br>在多核处理器中，同一进程中的多个线程可以并行执行；<br>如果进程中有一个线程阻塞了，不会影响其他线程执行；</li>
 <li>缺点：<br>对于用户级线程而言，模式切换开销较大。在同一进程中，从一个线程切换到另一个线程，需要从用户态切换到内核态。因为用户进程中的线程在用户态运行，而线程的调度和管理是在内核实现的。</li>
 </ul>
-<h2 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h2><p>用户级线程仅存在与用户空间中，对于这种线程的创建、撤销、线程间的同步等，都无需利用系统调用实现，而且内核完全不知道用户级线程的存在。<br>用户级线程都是在用户空间实现的，它们机构都相同，都运行在一个中间系统上。</p>
+<h2 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h2><p>用户级线程仅存在与用户空间中，对于这种线程的创建、撤销、线程间的同步等，都无需利用系统调用实现，而且内核完全不知道用户级线程的存在。<br>用户级线程都是在用户空间实现的，它们结构都相同，都运行在一个中间系统上。</p>
 <ul>
 <li>实现方式：<br>1）运行时系统<br>其实就是管理和控制线程的函数的集合组成的”系统”。包括创建、撤销、线程同步及通信的函数。正因为有这些函数，才使得用户级线程与内核无关，这些函数都驻留在用户空间。<br>2）轻量级进程(LWP)<br>在计算机操作系统中,轻量级进程（LWP）是一种实现多任务的方法。与普通进程相比，LWP与其他进程共享所有（或大部分）它的逻辑地址空间和系统资源；与线程相比，LWP有它自己的进程标识符，优先级，状态，以及栈和局部存储区，并和其他进程有着父子关系；<br>LWP可以通过系统调用来获得内核提供的服务，这样当一个用户级线程运行时，只要将它连接到一个LWP上，此时它便具有了内核支持线程的所有属性。</li>
 </ul>
 <ul>
-<li>优点：<br>线程切换不用进行状态切换，节省了开销；<br>用户级线程切换与操作系统平台无关，属于用户应用程序的一部分</li>
-<li>缺点：并发能力较差。在单纯的用户级线程实现中，多线程应用不能利用多处理器机制进行多重处理的优点。内核每次分配给一个进程的仅有一个CPU，因此进程中仅有一个线程能执行，在该线程放弃CPU之前，其他线程职能等待。</li>
+<li>优点：线程切换不用进行状态切换，节省了开销，用户级线程切换与操作系统平台无关，属于用户应用程序的一部分。</li>
+<li>缺点：并发能力较差。在单纯的用户级线程实现中，多线程应用不能利用多处理器机制进行多重处理的优点。内核每次分配给一个进程的仅有一个CPU，因此进程中仅有一个线程能执行，在该线程放弃CPU之前，其他线程只能等待。</li>
 </ul>
-<h1 id="用户线程与LWP连接的三种模型及优缺点"><a href="#用户线程与LWP连接的三种模型及优缺点" class="headerlink" title="用户线程与LWP连接的三种模型及优缺点"></a>用户线程与LWP连接的三种模型及优缺点</h1><p>1）一对一模型<br>该模型为每个用户级线程都设置一个内核线程与之连接，并发能力较强，但没创建一个用户线程，都需要创建一个内核线程，<br>2）多对一模型<br>该模型为多个用户级线程分配一个内核线程。这样的话，线程管理的开销较小，但是当一个线程在访问内核时发生阻塞，则整个进程会被阻塞。<br>3）多对多模型<br>多个用户线程连接到多个内核线程上，内核控制线程的数目可以根据应用基础和系统的不同而变化，可以比用户线程少，也可以与之相同。</p>
+<h1 id="用户线程与LWP连接的三种模型及优缺点"><a href="#用户线程与LWP连接的三种模型及优缺点" class="headerlink" title="用户线程与LWP连接的三种模型及优缺点"></a>用户线程与LWP连接的三种模型及优缺点</h1><p>1）一对一模型<br>该模型为每个用户级线程都设置一个内核线程与之连接，并发能力较强，但每创建一个用户线程，都需要创建一个内核线程。<br>2）多对一模型<br>该模型为多个用户级线程分配一个内核线程。这样的话，线程管理的开销较小，但是当一个线程在访问内核时发生阻塞，则整个进程会被阻塞。<br>3）多对多模型<br>多个用户线程连接到多个内核线程上，内核控制线程的数目可以根据应用和系统的不同而变化，可以比用户线程少，也可以与之相同。</p>
 
       
     </div>
@@ -397,12 +397,12 @@
                src="/avatar/Iversen.jpg"
                alt="Joe" />
           <p class="site-author-name" itemprop="name">Joe</p>
-          <p class="site-description motion-element" itemprop="description">持续学习</p>
+          <p class="site-description motion-element" itemprop="description">要改变现状，首先要改变自己；要改变自己，先要改变我们对问题的看法</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -476,7 +476,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
