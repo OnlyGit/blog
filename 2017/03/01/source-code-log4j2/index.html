@@ -1,0 +1,750 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sourceCode," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="log4j2源码简单浅析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="log4j2源码浅析">
+<meta property="og:url" content="http://zcty5v5.xyz/2017/03/01/source-code-log4j2/index.html">
+<meta property="og:site_name" content="Joe's blog">
+<meta property="og:description" content="log4j2源码简单浅析">
+<meta property="og:image" content="http://zcty5v5.xyz/images/log4j2/mind.png">
+<meta property="og:image" content="http://zcty5v5.xyz/images/log4j2/uml.png">
+<meta property="og:updated_time" content="2017-04-03T10:23:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="log4j2源码浅析">
+<meta name="twitter:description" content="log4j2源码简单浅析">
+<meta name="twitter:image" content="http://zcty5v5.xyz/images/log4j2/mind.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://zcty5v5.xyz/2017/03/01/source-code-log4j2/"/>
+
+
+
+
+
+  <title> log4j2源码浅析 | Joe's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Joe's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://zcty5v5.xyz/2017/03/01/source-code-log4j2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Joe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/Iversen.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Joe's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                log4j2源码浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-01T16:26:03+08:00">
+                2017-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/01/source-code-log4j2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/01/source-code-log4j2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">访问
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <hr>
+<p>log4j2源码简单浅析<br><a id="more"></a></p>
+<p>版本：2.8<br>简述：本文只是简单地整理了log4j2从加载到最后输出的流程，很多细节上的设计，后续会跟着写一下。比如工厂方法的应用，弱引用的使用等。</p>
+<h2 id="主脉路"><a href="#主脉路" class="headerlink" title="主脉路"></a>主脉路</h2><p>获取配置文件、解析配置文件；根据配置信息输出日志；</p>
+<ul>
+<li>获取、解析配置文件：由LoggerContext完成，通过start()方法；</li>
+<li>输出日志：通过LoggerContext获取对应的Logger，调用Logger的Appender列表，输出对应的日志；</li>
+</ul>
+<h2 id="关键部分及简单描述"><a href="#关键部分及简单描述" class="headerlink" title="关键部分及简单描述"></a>关键部分及简单描述</h2><p><img src="/images/log4j2/mind.png" alt="Alt text"></p>
+<h3 id="入口LogManager"><a href="#入口LogManager" class="headerlink" title="入口LogManager"></a>入口LogManager</h3><p>是log4j的入口，主要属性是LoggerContextFactory，看下初始化的逻辑：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="comment">// Shortcut binding to force a specific logging implementation.</span></span><br><span class="line">    <span class="comment">//PropertiesUtil 中加载的就是文件：log4j2.component.properties</span></span><br><span class="line">    <span class="keyword">final</span> PropertiesUtil managerProps = PropertiesUtil.getProperties();</span><br><span class="line">    <span class="keyword">final</span> String factoryClassName = managerProps.getStringProperty(FACTORY_PROPERTY_NAME);</span><br><span class="line">    <span class="keyword">if</span> (factoryClassName != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            factory = LoaderUtil.newCheckedInstanceOf(factoryClassName, LoggerContextFactory.class);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> ClassNotFoundException cnfe) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"Unable to locate configured LoggerContextFactory &#123;&#125;"</span>, factoryClassName);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception ex) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"Unable to create configured LoggerContextFactory &#123;&#125;"</span>, factoryClassName, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (factory == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">final</span> SortedMap&lt;Integer, LoggerContextFactory&gt; factories = <span class="keyword">new</span> TreeMap&lt;&gt;();</span><br><span class="line">        <span class="comment">// note that the following initial call to ProviderUtil may block until a Provider has been installed when</span></span><br><span class="line">        <span class="comment">// running in an OSGi environment</span></span><br><span class="line">        <span class="keyword">if</span> (ProviderUtil.hasProviders()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">final</span> Provider provider : ProviderUtil.getProviders()) &#123;</span><br><span class="line">                <span class="keyword">final</span> Class&lt;? extends LoggerContextFactory&gt; factoryClass = provider.loadLoggerContextFactory();</span><br><span class="line">                <span class="keyword">if</span> (factoryClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        factories.put(provider.getPriority(), factoryClass.newInstance());</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">                        LOGGER.error(<span class="string">"Unable to create class &#123;&#125; specified in &#123;&#125;"</span>, factoryClass.getName(), provider</span><br><span class="line">                                .getUrl().toString(), e);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (factories.isEmpty()) &#123;</span><br><span class="line">                LOGGER.error(<span class="string">"Log4j2 could not find a logging implementation. "</span></span><br><span class="line">                        + <span class="string">"Please add log4j-core to the classpath. Using SimpleLogger to log to the console..."</span>);</span><br><span class="line">                factory = <span class="keyword">new</span> SimpleLoggerContextFactory();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (factories.size() == <span class="number">1</span>) &#123;</span><br><span class="line">                factory = factories.get(factories.lastKey());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">final</span> StringBuilder sb = <span class="keyword">new</span> StringBuilder(<span class="string">"Multiple logging implementations found: \n"</span>);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">final</span> Map.Entry&lt;Integer, LoggerContextFactory&gt; entry : factories.entrySet()) &#123;</span><br><span class="line">                    sb.append(<span class="string">"Factory: "</span>).append(entry.getValue().getClass().getName());</span><br><span class="line">                    sb.append(<span class="string">", Weighting: "</span>).append(entry.getKey()).append(<span class="string">'\n'</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                factory = factories.get(factories.lastKey());</span><br><span class="line">                sb.append(<span class="string">"Using factory: "</span>).append(factory.getClass().getName());</span><br><span class="line">                LOGGER.warn(sb.toString());</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"Log4j2 could not find a logging implementation. "</span></span><br><span class="line">                    + <span class="string">"Please add log4j-core to the classpath. Using SimpleLogger to log to the console..."</span>);</span><br><span class="line">            factory = <span class="keyword">new</span> SimpleLoggerContextFactory();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>初始化LoggerContextFactory，优先通过配置文件log4j2.component.properties，获取log4j2.loggerContextFactory对应的配置信息。log4j2.component.properties中所有的配置信息，都是通过单例模式的PropertiesUtil缓存的。<br>如果没有找到上述信息，则通过ProviderUtil获取META-INF/log4j-provider.properties中的配置，并放入providers中(其实也是单例模式，采用的是懒初始化的方式)；log4j-provider.properties的内容如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LoggerContextFactory = org.apache.logging.log4j.core.impl.Log4jContextFactory</span><br><span class="line">Log4jAPIVersion = <span class="number">2.1</span>.0</span><br><span class="line">FactoryPriority= <span class="number">10</span></span><br></pre></td></tr></table></figure></p>
+<p>默认情况下，是找不到log4j2.component.properties文件的，因此LogManager中的LoggerContextFactory，默认就是org.apache.logging.log4j.core.impl.Log4jContextFactory；</p>
+<h3 id="获取LoggerContext实例"><a href="#获取LoggerContext实例" class="headerlink" title="获取LoggerContext实例"></a>获取LoggerContext实例</h3><p>Log4jContextFactory中有一个属性ContextSelector，默认是ClassLoaderContextSelector类型的对象，在Log4jContextFactory的构造方法中进行的初始化。看下getContext的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Log4jContextFactory.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> LoggerContext <span class="title">getContext</span><span class="params">(<span class="keyword">final</span> String fqcn, <span class="keyword">final</span> ClassLoader loader, <span class="keyword">final</span> Object externalContext,</span><br><span class="line">                                <span class="keyword">final</span> <span class="keyword">boolean</span> currentContext)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//返回LoggerContext的实例，仅仅是做了实例化</span></span><br><span class="line">    <span class="keyword">final</span> LoggerContext ctx = selector.getContext(fqcn, loader, currentContext);</span><br><span class="line">    <span class="keyword">if</span> (externalContext != <span class="keyword">null</span> &amp;&amp; ctx.getExternalContext() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        ctx.setExternalContext(externalContext);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (ctx.getState() == LifeCycle.State.INITIALIZED) &#123;</span><br><span class="line">        <span class="comment">//主要逻辑：查找配置文件，解析配置文件</span></span><br><span class="line">        ctx.start();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ctx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LogContext.start()调用逻辑：<br>LogContext.start()—&gt;LogContext.reconfigure()—&gt;LogContext.reconfigure(URI)<br>LogContext.reconfigure(URI)中，调用ConfigurationFactory.instance()，做了初始化工作，是对属性factories的初始化。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ConfigurationFactory.java</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> ConfigurationFactory configFactory = <span class="keyword">new</span> Factory();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ConfigurationFactory <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// volatile works in Java 1.6+, so double-checked locking also works properly</span></span><br><span class="line">    <span class="comment">//noinspection DoubleCheckedLocking</span></span><br><span class="line">    <span class="keyword">if</span> (factories == <span class="keyword">null</span>) &#123;</span><br><span class="line">        LOCK.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (factories == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">final</span> List&lt;ConfigurationFactory&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">                <span class="comment">//文章前面也提到了PropertiesUtil，可以参考</span></span><br><span class="line">                <span class="keyword">final</span> String factoryClass = PropertiesUtil.getProperties().getStringProperty(CONFIGURATION_FACTORY_PROPERTY);</span><br><span class="line">                <span class="keyword">if</span> (factoryClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    addFactory(list, factoryClass);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">final</span> PluginManager manager = <span class="keyword">new</span> PluginManager(CATEGORY);</span><br><span class="line">                manager.collectPlugins();</span><br><span class="line">                <span class="keyword">final</span> Map&lt;String, PluginType&lt;?&gt;&gt; plugins = manager.getPlugins();</span><br><span class="line">                <span class="keyword">final</span> List&lt;Class&lt;? extends ConfigurationFactory&gt;&gt; ordered = <span class="keyword">new</span> ArrayList&lt;&gt;(plugins.size());</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">final</span> PluginType&lt;?&gt; type : plugins.values()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        ordered.add(type.getPluginClass().asSubclass(ConfigurationFactory.class));</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception ex) &#123;</span><br><span class="line">                        LOGGER.warn(<span class="string">"Unable to add class &#123;&#125;"</span>, type.getPluginClass(), ex);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                Collections.sort(ordered, OrderComparator.getInstance());</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">final</span> Class&lt;? extends ConfigurationFactory&gt; clazz : ordered) &#123;</span><br><span class="line">                    addFactory(list, clazz);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// see above comments about double-checked locking</span></span><br><span class="line">                <span class="comment">//noinspection NonThreadSafeLazyInitialization</span></span><br><span class="line">                factories = Collections.unmodifiableList(list);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            LOCK.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    LOGGER.debug(<span class="string">"Using configurationFactory &#123;&#125;"</span>, configFactory);</span><br><span class="line">    <span class="keyword">return</span> configFactory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PluginManager用于管理log4j的插件类，是通过读取META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat，并按照category缓存起来的。在后面的逻辑中也会用到PluginManager。而这里是只获取category=CONFIGURATION_FACTORY_PROPERTY的插件信息，对应的列表如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yamlconfigurationfactory,org.apache.logging.log4j.core.config.yaml.YamlConfigurationFactory,YamlConfigurationFactory,<span class="keyword">false</span>,<span class="keyword">false</span>,configurationfactory</span><br><span class="line">jsonconfigurationfactory,org.apache.logging.log4j.core.config.json.JsonConfigurationFactory,JsonConfigurationFactory,<span class="keyword">false</span>,<span class="keyword">false</span>,configurationfactory</span><br><span class="line">propertiesconfigurationfactory,org.apache.logging.log4j.core.config.properties.PropertiesConfigurationFactory,PropertiesConfigurationFactory,<span class="keyword">false</span>,<span class="keyword">false</span>,configurationfactory</span><br><span class="line">xmlconfigurationfactory,org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory,XmlConfigurationFactory,<span class="keyword">false</span>,<span class="keyword">false</span>,configurationfactory</span><br></pre></td></tr></table></figure>
+<p>类名已经很明显，其实每个对应了一种格式的配置文件。<br>通过instance获取到ConfigurationFactory后，调用getConfiguration，会得到对应的配置信息，逻辑其实也很简单，其实就是尝试遍历上述列表中的factory，加载对应的配置信息，如果能通过factory找到对应的配置文件，则进行解析，最终生成对应的Configuration即可：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ConfigurationFactory.java(以下方法是ConfigurationFactory.Factory中的逻辑)</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Configuration <span class="title">getConfiguration</span><span class="params">(<span class="keyword">final</span> LoggerContext loggerContext, <span class="keyword">final</span> <span class="keyword">boolean</span> isTest, <span class="keyword">final</span> String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> named = Strings.isNotEmpty(name);</span><br><span class="line">    <span class="keyword">final</span> ClassLoader loader = LoaderUtil.getThreadContextClassLoader();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> ConfigurationFactory factory : getFactories()) &#123;</span><br><span class="line">        String configName;</span><br><span class="line">        <span class="keyword">final</span> String prefix = isTest ? TEST_PREFIX : DEFAULT_PREFIX;</span><br><span class="line">        <span class="keyword">final</span> String [] types = factory.getSupportedTypes();</span><br><span class="line">        <span class="keyword">if</span> (types == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">final</span> String suffix : types) &#123;</span><br><span class="line">            <span class="keyword">if</span> (suffix.equals(ALL_TYPES)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            configName = named ? prefix + name + suffix : prefix + suffix;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> ConfigurationSource source = getInputFromResource(configName, loader);</span><br><span class="line">            <span class="keyword">if</span> (source != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> factory.getConfiguration(loggerContext, source);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="解析配置信息"><a href="#解析配置信息" class="headerlink" title="解析配置信息"></a>解析配置信息</h3><p>此时，已经得到对应的配置信息，接下来就是解析配置信息，其实就是再次解析上面得到的Configuration，转换成其他数据结构。用XmlConfigurationFactory举例，前面的逻辑得到的XmlConfiguration只是简单的配置信息，Element rootElement，在调用configuration.start后，会将rootElement转换为Node rootNode，node其实是一个树形结构，start逻辑过后，就形成了一颗完整的树状结构，每个node都有对应的一个Object对象。比如：</p>
+<p>&lt;Appender type=”Console” name=”STDOUT”&gt;  就对应一个java对象：ConsoleAppender。</p>
+<p>&lt;Appender type=”File” name=”File” fileName=”${filename}”&gt;对应：FileAppender。<br>关于XmlConfigurationFactory的解析，我们会在后面详细讲一下。</p>
+<p>我们最终获取到的Configuration就是由这一系列的对象构成的，也就是说完成了配置文件到java对象的转换！context的start逻辑也就结束了。</p>
+<h3 id="通过context获取logger"><a href="#通过context获取logger" class="headerlink" title="通过context获取logger"></a>通过context获取logger</h3><p>获取logger，其实就是为了获取loggerconfig，也就是对应了配置文件中的<loggers>标签下的某一个<logger>标签对应的配置。当然这里也有缓存，是保存在LoggerContext.loggerRegistry中的。获取到了logger，也就得到了appenders，最终打印日志，也是通过这一系列appender输出的。<br>代码逻辑比较简单，我们看下Logger的类图：</logger></loggers></p>
+<p><img src="/images/log4j2/uml.png" alt="Alt text"></p>
+<p>比较绕的几个地方：<br>1.以xml配置为例，如何根据xml标签，构造对应的java对象呢？主要逻辑：解析xml，其实是将tag转换为对应的Node对象，Node中有个PluginType对象，这个对象就是用来将tag转换为对应的java对象的。而PluginType是通过PluginManager管理的。<br>关键代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// XmlConfiguration.java</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">constructHierarchy</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">final</span> Element element)</span> </span>&#123;</span><br><span class="line">    processAttributes(node, element);</span><br><span class="line">    <span class="keyword">final</span> StringBuilder buffer = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">final</span> NodeList list = element.getChildNodes();</span><br><span class="line">    <span class="keyword">final</span> List&lt;Node&gt; children = node.getChildren();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.getLength(); i++) &#123;</span><br><span class="line">        <span class="keyword">final</span> org.w3c.dom.Node w3cNode = list.item(i);</span><br><span class="line">        <span class="keyword">if</span> (w3cNode <span class="keyword">instanceof</span> Element) &#123;</span><br><span class="line">            <span class="keyword">final</span> Element child = (Element) w3cNode;</span><br><span class="line">            <span class="comment">//对应的plugin名称(优先获取标签的type属性，没有则使用标签名)</span></span><br><span class="line">            <span class="keyword">final</span> String name = getType(child);</span><br><span class="line">            <span class="comment">//设置node对应的pluginType，用于后面设置node的Object属性</span></span><br><span class="line">            <span class="keyword">final</span> PluginType&lt;?&gt; type = pluginManager.getPluginType(name);</span><br><span class="line">            <span class="keyword">final</span> Node childNode = <span class="keyword">new</span> Node(node, name, type);</span><br><span class="line">            constructHierarchy(childNode, child);</span><br><span class="line">            <span class="keyword">if</span> (type == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">final</span> String value = childNode.getValue();</span><br><span class="line">                <span class="keyword">if</span> (!childNode.hasChildren() &amp;&amp; value != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    node.getAttributes().put(name, value);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    status.add(<span class="keyword">new</span> Status(name, element, ErrorType.CLASS_NOT_FOUND));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                children.add(childNode);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (w3cNode <span class="keyword">instanceof</span> Text) &#123;</span><br><span class="line">            <span class="keyword">final</span> Text data = (Text) w3cNode;</span><br><span class="line">            buffer.append(data.getData());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> String text = buffer.toString().trim();</span><br><span class="line">    <span class="keyword">if</span> (text.length() &gt; <span class="number">0</span> || (!node.hasChildren() &amp;&amp; !node.isRoot())) &#123;</span><br><span class="line">        node.setValue(text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//AbstractConfiguration.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createConfiguration</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">final</span> LogEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> PluginType&lt;?&gt; type = node.getType();</span><br><span class="line">    <span class="keyword">if</span> (type != <span class="keyword">null</span> &amp;&amp; type.isDeferChildren()) &#123;</span><br><span class="line">        node.setObject(createPluginObject(type, node, event));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">final</span> Node child : node.getChildren()) &#123;</span><br><span class="line">            createConfiguration(child, event);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (type == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (node.getParent() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                LOGGER.error(<span class="string">"Unable to locate plugin for &#123;&#125;"</span>, node.getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            node.setObject(createPluginObject(type, node, event));<span class="comment">//设置每个节点对应的java对象</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">createPluginObject</span><span class="params">(<span class="keyword">final</span> PluginType&lt;?&gt; type, <span class="keyword">final</span> Node node, <span class="keyword">final</span> LogEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Class&lt;?&gt; clazz = type.getPluginClass();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Map.class.isAssignableFrom(clazz)) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> createPluginMap(node);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">            LOGGER.warn(<span class="string">"Unable to create Map for &#123;&#125; of class &#123;&#125;"</span>, type.getElementName(), clazz, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Collection.class.isAssignableFrom(clazz)) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> createPluginCollection(node);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">            LOGGER.warn(<span class="string">"Unable to create List for &#123;&#125; of class &#123;&#125;"</span>, type.getElementName(), clazz, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PluginBuilder(type).withConfiguration(<span class="keyword">this</span>).withConfigurationNode(node).forLogEvent(event).build();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//PluginBuilder.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    verify();</span><br><span class="line">    <span class="comment">// first try to use a builder class if one is available</span></span><br><span class="line">    <span class="comment">//this.clazz 就是之前在构建node时，设置的PluginType的class信息。这里通过clazz调用对应的方法构建对象</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        LOGGER.debug(<span class="string">"Building Plugin[name=&#123;&#125;, class=&#123;&#125;]."</span>, pluginType.getElementName(),</span><br><span class="line">                pluginType.getPluginClass().getName());</span><br><span class="line">        <span class="comment">//使用PluginBuilderFactory注解的方法</span></span><br><span class="line">        <span class="keyword">final</span> Builder&lt;?&gt; builder = createBuilder(<span class="keyword">this</span>.clazz);<span class="comment">//利用注解进行配置</span></span><br><span class="line">        <span class="keyword">if</span> (builder != <span class="keyword">null</span>) &#123;</span><br><span class="line">            injectFields(builder);</span><br><span class="line">            <span class="keyword">return</span> builder.build();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"Unable to inject fields into builder class for plugin type &#123;&#125;, element &#123;&#125;."</span>, <span class="keyword">this</span>.clazz,</span><br><span class="line">            node.getName(), e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// or fall back to factory method if no builder class is available</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//使用PluginFactory注解的方法</span></span><br><span class="line">        <span class="keyword">final</span> Method factory = findFactoryMethod(<span class="keyword">this</span>.clazz);</span><br><span class="line">        <span class="keyword">final</span> Object[] params = generateParameters(factory);</span><br><span class="line">        <span class="keyword">return</span> factory.invoke(<span class="keyword">null</span>, params);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"Unable to invoke factory method in class &#123;&#125; for element &#123;&#125;."</span>, <span class="keyword">this</span>.clazz, <span class="keyword">this</span>.node.getName(),</span><br><span class="line">            e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.接着在上面提到的讲PluginBuilder的build方法。clazz属性，其实就是PluginManager中管理的各个plugin类，这些plugin信息，是保存在<br>META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat中的。<br>不论是createBuilder方法，还是factory.invoke方法，其实都是通过反射的方式，进行调用的。每个逻辑都比较简单。</p>
+<p>后续…. 文章比较简单的描述了下log4j2的工作原理，正如开始就说到的，还有很多细节需要深入去研究，以后会相继写出来…</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sourceCode/" rel="tag"># sourceCode</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/06/OSC-Notes-Process-First/" rel="next" title="操作系统概念笔记-进程篇(一)">
+                <i class="fa fa-chevron-left"></i> 操作系统概念笔记-进程篇(一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/03/01/source-code-log4j2/"
+           data-title="log4j2源码浅析" data-url="http://zcty5v5.xyz/2017/03/01/source-code-log4j2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/Iversen.jpg"
+               alt="Joe" />
+          <p class="site-author-name" itemprop="name">Joe</p>
+           
+              <p class="site-description motion-element" itemprop="description">要改变现状，首先要改变自己；要改变自己，先要改变我们对问题的看法</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/OnlyGit" target="_blank" title="GitHub">
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://my.csdn.net/x_qiang_d" target="_blank" title="CSDN">
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主脉路"><span class="nav-number">1.</span> <span class="nav-text">主脉路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关键部分及简单描述"><span class="nav-number">2.</span> <span class="nav-text">关键部分及简单描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#入口LogManager"><span class="nav-number">2.1.</span> <span class="nav-text">入口LogManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取LoggerContext实例"><span class="nav-number">2.2.</span> <span class="nav-text">获取LoggerContext实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析配置信息"><span class="nav-number">2.3.</span> <span class="nav-text">解析配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过context获取logger"><span class="nav-number">2.4.</span> <span class="nav-text">通过context获取logger</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe</span>
+</div>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zcty5v5"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
